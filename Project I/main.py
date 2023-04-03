@@ -1,7 +1,7 @@
-import json, csv
-import numpy as np
+import json
 import pandas as pd
 from tower import Tower
+
 
 def read_population(file):
     population_data = pd.read_csv(file, sep=',')
@@ -16,8 +16,8 @@ def read_config(file):
 
 if __name__ == '__main__':
     json_data = read_config('problem_config.txt')
-    print(json_data)
     tower = Tower(json_data)
+    print(str(tower))
 
     population = read_population('blocks_population.txt')
     print(population)
