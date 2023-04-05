@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-from tower import Tower
+from config import Configurations
 
 
 def read_population(file):
@@ -16,8 +16,8 @@ def read_config(file):
 
 if __name__ == '__main__':
     json_data = read_config('problem_config.txt')
-    tower = Tower(json_data)
-    print(str(tower))
+    config = Configurations(json_data)
+    print(str(config))
 
     population = read_population('blocks_population.txt')
     print(population)
