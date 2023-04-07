@@ -1,27 +1,36 @@
+import json
 class Configurations:
-    def __init__(self, json_data) -> None:
-        self.cost = json_data['tower_construction_cost']
-        self.maintenance = json_data['tower_maintanance_cost']
-        self.levels = json_data['user_satisfaction_levels']
-        self.scores = json_data['user_satisfaction_scores']
-        
-    def __str__(self) -> str:
+
+    @classmethod
+    def load_config(cls, file):
+        with open(file) as f:
+            json_data = json.load(f)
+            
+        cls.cost = json_data['tower_construction_cost']
+        cls.maintenance = json_data['tower_maintanance_cost']
+        cls.levels = json_data['user_satisfaction_levels']
+        cls.scores = json_data['user_satisfaction_scores']
+
+
+    @classmethod
+    def show_configurations(cls):
         return f'''
         ---------------Tower Configurations:---------------
-        Consturction Cost: {self.cost}$
-        Cost per 1MB/s: {self.maintenance}$
-        Customer Satisfaction Levels: {self.levels}
-        Customer Satisfaction Scores: {self.scores}
+        Consturction Cost: {cls.cost}$
+        Cost per 1MB/s: {cls.maintenance}$
+        Customer Satisfaction Levels: {cls.levels}
+        Customer Satisfaction Scores: {cls.scores}
         ---------------------------------------------------
         '''
-
-    def get_score(self, bw):
-        if bw < self.levels[0]:
+    
+    @classmethod
+    def get_score(cls, bw):
+        if bw < cls.levels[0]:
             return 0.0
         
-        if bw > self.levels[-1]:
-            return self.scores[-1]
+        if bw > cls.levels[-1]:
+            return cls.scores[-1]
         
-        for i in range(1, len(self.levels)):
-            if self.levels[i-1] <= bw < self.levels[i]:
-                return self.scores[i-1]
+        for i in range(1, len(cls.levels)):
+            if cls.levels[i-1] <= bw < cls.levels[i]:
+                return cls.scores[i-1]
