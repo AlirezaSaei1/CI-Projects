@@ -1,6 +1,8 @@
 import json
 import pandas as pd
 from config import Configurations as cnf
+from GA import GeneticAlgorithm
+
 
 
 def read_population(file):
@@ -19,5 +21,8 @@ if __name__ == '__main__':
     print(cnf.show_configurations())
 
     population = read_population('blocks_population.txt')
-    print(population)
+    #print(population)
 
+    shape = population.shape
+    ga = GeneticAlgorithm(10, max(cnf.levels)*5, shape[0], shape[1], 30)
+    print('Population size:', len(ga.population))
