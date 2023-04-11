@@ -2,21 +2,27 @@ import random
 from tower import Tower
 
 class GeneticAlgorithm:
-    def __init__(self, max_towers, max_bandwidth, x_range, y_range, population_size) -> None:
-        self.population = self.initialize_population(max_towers, max_bandwidth, x_range, y_range, population_size)
+    def __init__(self, max_towers, max_bandwidth, x_range, y_range, population_size, mutation_probability) -> None:
+        self.max_towers = max_towers
+        self.max_bandwidth = max_bandwidth
+        self.x_range = x_range
+        self.y_range = y_range
+        self.population_size = population_size
+        self.mutation_probability = mutation_probability
+        self.population = self.initialize_population()
 
 
-    def initialize_population(self, max_towers, max_bandwidth, x_range, y_range, population_size):
+    def initialize_population(self):
         population = []
-        for _ in range(population_size):
-            num_towers = random.randint(1, max_towers)
+        for _ in range(self.population_size):
+            num_towers = random.randint(1, self.max_towers)
             
             # Build random towers
             towers = []
             for _ in range(num_towers):
-                x = random.uniform(0, x_range)
-                y = random.uniform(0, y_range)
-                bandwidth = random.uniform(0, max_bandwidth)
+                x = random.uniform(0, self.x_range)
+                y = random.uniform(0, self.y_range)
+                bandwidth = random.uniform(0, self.max_bandwidth)
                 twr = Tower(x, y, bandwidth)
                 towers.append(twr)
             
@@ -45,7 +51,7 @@ class GeneticAlgorithm:
             offspring2 = parent2[:point] + parent1[point:]
             offspring.append(offspring1)
             offspring.append(offspring2)
-            
+
         return offspring
     
     def two_point_crossover(parent1, parent2):
@@ -58,3 +64,31 @@ class GeneticAlgorithm:
         return child1, child2
     
 
+    def mutate(self, tower):
+        attribute_to_mutate = random.choice(["X", "Y", "BW"])
+        mutated_tower = Tower(tower.x, tower.y, tower.bw)
+
+        if attribute_to_mutate == "X":
+            mutated_tower.x = random.uniform(0, self.x_range)
+        elif attribute_to_mutate == "Y":
+            mutated_tower.y = random.uniform(0, self.y_range)
+        else:
+            mutated_tower.bw = random.uniform(0, self.max_bandwidth)
+
+        return mutated_tower
+    
+
+    def mutate_population(self, population):
+        mutated_population = []
+        for towers in population:
+            mutated_towers = []
+            for tower in towers:
+                if random.random() < self.mutation_probability:
+                    mutated_towers.append(self.mutate(tower))
+                else:
+                    mutated_towers.append(tower)
+            mutated_population.append(mutated_towers)
+        return mutated_population
+    
+
+    
