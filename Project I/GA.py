@@ -45,6 +45,16 @@ class GeneticAlgorithm:
             offspring2 = parent2[:point] + parent1[point:]
             offspring.append(offspring1)
             offspring.append(offspring2)
+            
         return offspring
+    
+    def two_point_crossover(parent1, parent2):
+        point1 = random.randint(0, len(parent1)-1)
+        point2 = random.randint(point1+1, len(parent1))
+        
+        child1 = parent1[:point1] + parent2[point1:point2] + parent1[point2:]
+        child2 = parent2[:point1] + parent1[point1:point2] + parent2[point2:]
+
+        return child1, child2
     
 
