@@ -54,6 +54,7 @@ class GeneticAlgorithm:
 
         return offspring
     
+    
     def two_point_crossover(parent1, parent2):
         point1 = random.randint(0, len(parent1)-1)
         point2 = random.randint(point1+1, len(parent1))
@@ -78,6 +79,7 @@ class GeneticAlgorithm:
         return mutated_tower
     
 
+    # We can use other methods later
     def mutate_population(self, population):
         mutated_population = []
         for towers in population:
@@ -91,4 +93,7 @@ class GeneticAlgorithm:
         return mutated_population
     
 
-    
+    # We can use other methods later 
+    def replace_population(self, population, offspring):
+        combined_population = population + offspring
+        return sorted(combined_population, key=lambda x: x.fitness, reverse=True)[:self.population_size]
