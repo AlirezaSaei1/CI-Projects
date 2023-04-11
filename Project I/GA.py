@@ -23,3 +23,13 @@ class GeneticAlgorithm:
             population.append(towers)
 
         return population
+    
+    # must implement
+    def fitness(self):
+        pass
+
+    def selection(self, population, num_parents):
+        sorted_pop = sorted(population, key=lambda x: x.fitness, reverse=True)
+        return sorted_pop[:num_parents]
+    
+    
