@@ -24,12 +24,27 @@ class GeneticAlgorithm:
 
         return population
     
+
     # must implement
     def fitness(self):
         pass
+
 
     def selection(self, population, num_parents):
         sorted_pop = sorted(population, key=lambda x: x.fitness, reverse=True)
         return sorted_pop[:num_parents]
     
+
+    def one_point_crossover(self, parents, offspring_size):
+        offspring = []
+        for _ in range(offspring_size):
+            parent1 = parents[random.randint(0, len(parents)-1)]
+            parent2 = parents[random.randint(0, len(parents)-1)]
+            point = random.randint(1, len(parent1)-1)
+            offspring1 = parent1[:point] + parent2[point:]
+            offspring2 = parent2[:point] + parent1[point:]
+            offspring.append(offspring1)
+            offspring.append(offspring2)
+        return offspring
     
+
