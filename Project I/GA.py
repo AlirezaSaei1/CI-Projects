@@ -35,9 +35,28 @@ class GeneticAlgorithm:
         return population
     
 
-    # must implement
     def fitness(self, genotype):
-        pass
+        # calculate total cost of towers
+        cost = sum([tower.calculate_cost() for tower in genotype.towers])
+        print(cost)
+        
+        # calculate total score of customers
+        scores = 0.0
+        for i in range(self.x_range):
+            for j in range(self.y_range):
+                id = genotype.map[i][j]
+                T = genotype.get_tower_by_id(id)
+
+                tower_covered_population = 0
+                for ii in range(self.x_range):
+                    for jj in range(self.y_range):
+                        if id == genotype.map[ii][jj]:
+                            tower_covered_population += self.map[ii][jj]
+
+                real_block_bw = calculate_real_block_bandwidth((T.x, T.y), (i, j), T.bw, self.map[i][j], tower_covered_population)
+                user_bw = calculate_user_bandwidth(real_block_bw, self.map[i][j])
+                scores += cnf.get_score(user_bw) * self.map[i][j]
+        print(scores)
                 
 
     def selection(self, population, num_parents):
