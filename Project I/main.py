@@ -26,3 +26,4 @@ if __name__ == '__main__':
     shape = population.shape
     ga = GeneticAlgorithm(10, max(cnf.levels)*5, shape[0], shape[1], 30)
     print('Population size:', len(ga.population))
+    print(ga.population.towers)

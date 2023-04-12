@@ -1,8 +1,9 @@
 import random
 from tower import Tower
+from gene import Gene
 
 class GeneticAlgorithm:
-    def __init__(self, max_towers, max_bandwidth, x_range, y_range, population_size, mutation_probability) -> None:
+    def __init__(self, max_towers, max_bandwidth, x_range, y_range, population_size, mutation_probability=0.4) -> None:
         self.max_towers = max_towers
         self.max_bandwidth = max_bandwidth
         self.x_range = x_range
@@ -25,8 +26,8 @@ class GeneticAlgorithm:
                 bandwidth = random.uniform(0, self.max_bandwidth)
                 twr = Tower(x, y, bandwidth)
                 towers.append(twr)
-            
-            population.append(towers)
+
+            population.append(Gene(towers, self.x_range, self.y_range))
 
         return population
     
