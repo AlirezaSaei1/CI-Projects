@@ -20,9 +20,9 @@ if __name__ == '__main__':
     print(cnf.show_configurations())
 
     population = read_population('data/blocks_population.txt')
-
+    
     shape = population.shape
-    ga = GeneticAlgorithm(10, max(cnf.levels)*10, shape[0], shape[1], 40)
+    ga = GeneticAlgorithm(population, 10, max(cnf.levels)*10, shape[0], shape[1], 40)
     ga.mutate_population(ga.population)
     print('Population size:', len(ga.population))
 

@@ -13,3 +13,9 @@ class Genotype:
 
     def assign_to_towers(self):
         return np.random.randint(0, (len(self.towers)), size=(self.n, self.m))
+    
+    
+    def get_tower_by_id(self, id):
+        for twr in self.towers:
+            if (id == twr.id):
+                return twr

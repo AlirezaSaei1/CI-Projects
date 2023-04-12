@@ -2,9 +2,11 @@ import random
 from tower import Tower
 from genotype import Genotype
 import numpy as np
+from config import Configurations as cnf
 
 class GeneticAlgorithm:
-    def __init__(self, max_towers, max_bandwidth, x_range, y_range, population_size, mutation_probability=0.4) -> None:
+    def __init__(self, population, max_towers, max_bandwidth, x_range, y_range, population_size, mutation_probability=0.4) -> None:
+        self.map = population
         self.max_towers = max_towers
         self.max_bandwidth = max_bandwidth
         self.x_range = x_range
@@ -36,7 +38,7 @@ class GeneticAlgorithm:
     # must implement
     def fitness(self, genotype):
         pass
-
+                
 
     def selection(self, population, num_parents):
         sorted_pop = sorted(population, key=lambda x: x.fitness, reverse=True)
@@ -129,11 +131,9 @@ def calcualte_nominal_block_bandwidth(tower_bandwith, block_population, tower_co
 # This function calculates assigned bandwith for each block
 # Notice that this function's return value is a real value
 def calculate_real_block_bandwidth(tower_coordinates, block_coordinates, tower_bandwidth, block_population, tower_covered_blocks_population):
-    mat = np.array([8, 0],
-                   [0, 8])
+    mat = np.array([[8, 0], [0, 8]])
     
     mat = np.linalg.inv(mat)
     nominal_bw = calcualte_nominal_block_bandwidth(tower_bandwidth, block_population, tower_covered_blocks_population)
-    diff = block_coordinates - tower_coordinates
-
-    return np.exp(-1/2*diff*mat*np.transpose(diff)) * nominal_bw
+    diff = np.array(block_coordinates) - np.array(tower_coordinates)
+    return np.exp(-0.5 * np.matmul(diff, np.matmul(mat, np.transpose(diff)))) * nominal_bw

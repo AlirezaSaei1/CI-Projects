@@ -26,7 +26,7 @@ class Configurations:
     @classmethod
     def get_score(cls, bw):
         if bw < cls.levels[0]:
-            return 0.0
+            return 0
         
         if bw > cls.levels[-1]:
             return cls.scores[-1]
