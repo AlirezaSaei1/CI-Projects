@@ -100,24 +100,30 @@ class GeneticAlgorithm:
         combined_population = population + offspring
         return sorted(combined_population, key=lambda x: x.fitness, reverse=True)[:self.population_size]
 
+
+
 # This function calculates assigned bandwidth for each user in a block
 def calculate_user_bandwidth(block_bandwidth, block_population):
     return block_bandwidth/block_population
 
+
 # This function calculates assigned bandwith for each block
-# Notice that this fnction's return value is nominal
+# Notice that this function's return value is nominal
 # We need to calculate population for blocks that are covered by a tower
 def calcualte_nominal_block_bandwidth(tower_bandwith, block_population, tower_covered_blocks_population):
     return block_population * tower_bandwith / tower_covered_blocks_population
 
+
 # This function calculates assigned bandwith for each block
 # Notice that this function's return value is a real value
-def calculate_real_block_bandwidth(tower_coordinates, block_coordinates):
+def calculate_real_block_bandwidth(tower_coordinates, block_coordinates, tower_bandwidth, block_population, tower_covered_blocks_population):
     mat = np.array([8, 0],
                    [0, 8])
     
     mat = np.linalg.inv(mat)
 
+    nominal_bw = calcualte_nominal_block_bandwidth(tower_bandwidth, block_population, tower_covered_blocks_population)
+
     diff = block_coordinates - tower_coordinates
 
-    return np.exp(-1/2*diff*mat*np.transpose(diff))
+    return np.exp(-1/2*diff*mat*np.transpose(diff)) * nominal_bw
