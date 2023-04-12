@@ -7,14 +7,7 @@ class Tower:
         self.x = x
         self.y = y
         self.bw = bw
-        self.cost = self.calculate_cost()
-
 
     def calculate_cost(self):
         return self.bw * cnf.maintenance + cnf.cost
-    
-    
-    def calculate_total_cost(self, towers):
-        return sum([tower.cost for tower in towers])
-    
 
