@@ -1,6 +1,6 @@
 import random
 from tower import Tower
-from gene import Gene
+from genotype import Genotype
 import numpy as np
 
 class GeneticAlgorithm:
@@ -28,7 +28,7 @@ class GeneticAlgorithm:
                 twr = Tower(x, y, bandwidth)
                 towers.append(twr)
 
-            population.append(Gene(towers, self.x_range, self.y_range))
+            population.append(Genotype(towers, self.x_range, self.y_range))
 
         return population
     
@@ -80,20 +80,32 @@ class GeneticAlgorithm:
 
         return mutated_tower
     
+    
+    def mutate_map(self, map, n, m):
+        new_map = np.array([0]*n*m).reshape(n, m)
+        for i in range(n):
+            for j in range(m):
+                if random.random() < 0.1:
+                    new_map[i][j] = random.randint(0, self.max_towers - 1)
+                else:
+                    new_map[i][j] = map[i][j]
+        return new_map
 
-    # We can use other methods later
+
     def mutate_population(self, population):
         mutated_population = []
-        for towers in population:
+        for genotype in population:
             mutated_towers = []
-            for tower in towers:
+            for tower in genotype.towers:
                 if random.random() < self.mutation_probability:
                     mutated_towers.append(self.mutate(tower))
                 else:
                     mutated_towers.append(tower)
-            mutated_population.append(mutated_towers)
+            mutated_map = self.mutate_map(genotype.map, self.x_range, self.y_range)
+            mutated_genotype = Genotype(mutated_towers, self.x_range, self.y_range, mutated_map)
+            mutated_population.append(mutated_genotype)
         return mutated_population
-    
+
 
     # We can use other methods later 
     def replace_population(self, population, offspring):
