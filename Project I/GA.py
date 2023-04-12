@@ -28,13 +28,13 @@ class GeneticAlgorithm:
                 twr = Tower(x, y, bandwidth)
                 towers.append(twr)
 
-            population.append(Genotype(towers, self.x_range, self.y_range))
+            population.append(Genotype(np.array(towers), self.x_range, self.y_range))
 
         return population
     
 
     # must implement
-    def fitness(self):
+    def fitness(self, genotype):
         pass
 
 
@@ -133,9 +133,7 @@ def calculate_real_block_bandwidth(tower_coordinates, block_coordinates, tower_b
                    [0, 8])
     
     mat = np.linalg.inv(mat)
-
     nominal_bw = calcualte_nominal_block_bandwidth(tower_bandwidth, block_population, tower_covered_blocks_population)
-
     diff = block_coordinates - tower_coordinates
 
     return np.exp(-1/2*diff*mat*np.transpose(diff)) * nominal_bw
