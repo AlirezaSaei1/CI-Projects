@@ -5,7 +5,7 @@ import numpy as np
 from config import Configurations as cnf
 
 class GeneticAlgorithm:
-    def __init__(self, population, max_towers, max_bandwidth, x_range, y_range, population_size, mutation_probability=0.4) -> None:
+    def __init__(self, population, max_towers, max_bandwidth, x_range, y_range, population_size, mutation_probability=0.1, crossover_probability=0.9) -> None:
         self.map = population
         self.max_towers = max_towers
         self.max_bandwidth = max_bandwidth
@@ -13,6 +13,7 @@ class GeneticAlgorithm:
         self.y_range = y_range
         self.population_size = population_size
         self.mutation_probability = mutation_probability
+        self.crossover_probability = crossover_probability
         self.population = self.initialize_population()
 
 
@@ -68,6 +69,22 @@ class GeneticAlgorithm:
             parents.append(fittest)
 
         return parents
+    
+
+    def normalize_genotype(self, geno, towers, map):
+        pass
+    
+
+    def one_point_crossover(self, genotypes):
+        parent1, parent2 = random.sample(genotypes, 2)
+        
+        crossover_point = random.randint(1, len(parent1.towers)-1)
+        
+        offspring1 = self.normalize_genotype(parent1, parent1.towers[:crossover_point] + parent2.towers[crossover_point:])
+        offspring2 = self.normalize_genotype(parent2, parent2.towers[:crossover_point] + parent1.towers[crossover_point:])
+
+        return offspring1, offspring2
+
     
 
     def mutate(self, tower):
@@ -132,7 +149,7 @@ def calcualte_nominal_block_bandwidth(tower_bandwith, block_population, tower_co
 # This function calculates assigned bandwith for each block
 # Notice that this function's return value is a real value
 def calculate_real_block_bandwidth(tower_coordinates, block_coordinates, tower_bandwidth, block_population, tower_covered_blocks_population):
-    mat = np.array([[8, 0], [0, 8]])
+    mat = np.array([[0, 8], [8, 0]])
     
     mat = np.linalg.inv(mat)
     nominal_bw = calcualte_nominal_block_bandwidth(tower_bandwidth, block_population, tower_covered_blocks_population)
