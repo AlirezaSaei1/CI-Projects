@@ -24,15 +24,18 @@ if __name__ == '__main__':
     cnf.load_config('data/problem_config.txt')
     print(cnf.show_configurations())
 
-    # total population is = 191932
     population = read_population('data/blocks_population.txt')
     
     shape = population.shape
-    ga = GeneticAlgorithm(population, 100, max(cnf.levels)*10000, shape[0], shape[1], 40)
-    ga.mutate_population(ga.population)
-    print('Population size:', len(ga.population))
+    ga = GeneticAlgorithm(population, 100, max(cnf.levels)*10000, shape[0], shape[1], 50, mutation_probability=0.1, crossover_probability=0.9)
+    
+    for _ in range(50):
+        selected_parents = ga.selection(ga.population, len(ga.population))
+        
+        recombined_genotypes = ga.one_point_crossover(selected_parents)
 
-    print(f'First gentotype tower count: {len(ga.population[0].towers)}')
-    print(ga.fitness(ga.population[0]))
+        mutated_genotypes = ga.mutate_population(recombined_genotypes)
 
-    ga.one_point_crossover([ga.population[0], ga.population[25]])
+        ga.population = ga.replace_population(ga.population, mutated_genotypes)
+
+        print(np.mean([ga.fitness(genotype) for genotype in ga.population]))

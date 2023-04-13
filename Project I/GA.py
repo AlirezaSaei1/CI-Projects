@@ -31,7 +31,7 @@ class GeneticAlgorithm:
                 twr = Tower(x, y, bandwidth)
                 towers.append(twr)
 
-            population.append(Genotype(np.array(towers), self.x_range, self.y_range))
+            population.append(Genotype(np.array(towers), self.x_range, self.y_range, []))
 
         return population
     
@@ -45,6 +45,7 @@ class GeneticAlgorithm:
         for i in range(self.x_range):
             for j in range(self.y_range):
                 id = genotype.map[i][j]
+
                 T = genotype.get_tower_by_id(id)
 
                 tower_covered_population = 0
@@ -52,7 +53,7 @@ class GeneticAlgorithm:
                     for jj in range(self.y_range):
                         if id == genotype.map[ii][jj]:
                             tower_covered_population += self.map[ii][jj]
-
+                
                 real_block_bw = calculate_real_block_bandwidth((T.x, T.y), (i, j), T.bw, self.map[i][j], tower_covered_population)
                 user_bw = calculate_user_bandwidth(real_block_bw, self.map[i][j])
                 scores += cnf.get_score(user_bw) * self.map[i][j]
@@ -65,7 +66,8 @@ class GeneticAlgorithm:
         for _ in range(num_parents):
             k = 3
             individuals = random.sample(population, k)
-            fittest = max(individuals, key=lambda x: x.fitness)
+            fittest = max(individuals, key=lambda x: self.fitness(x))
+            fittest = self.normalize_genotype(fittest, fittest.towers)
             parents.append(fittest)
 
         return parents
@@ -98,13 +100,11 @@ class GeneticAlgorithm:
 
     def one_point_crossover(self, genotypes):
         genotype1, genotype2 = random.sample(genotypes, 2)
-        
-        crossover_point = random.randint(0, min(len(genotype2.towers), len(genotype1.towers)-1))
-        
-        offspring1 = self.normalize_genotype(genotype1, np.concatenate((genotype1.towers[:crossover_point], genotype2.towers[crossover_point:])))
-        offspring2 = self.normalize_genotype(genotype2, np.concatenate((genotype2.towers[:crossover_point], genotype1.towers[crossover_point:])))
-
-        return offspring1, offspring2
+        if random.random() < self.crossover_probability:
+            crossover_point = random.randint(0, min(len(genotype2.towers), len(genotype1.towers)-1))
+            genotype1 = self.normalize_genotype(genotype1, np.concatenate((genotype1.towers[:crossover_point], genotype2.towers[crossover_point:])))
+            genotype2 = self.normalize_genotype(genotype2, np.concatenate((genotype2.towers[:crossover_point], genotype1.towers[crossover_point:])))
+        return genotype1, genotype2
 
     
 
@@ -122,12 +122,12 @@ class GeneticAlgorithm:
         return mutated_tower
     
     
-    def mutate_map(self, map, n, m):
+    def mutate_map(self, map, n, m, towers_num):
         new_map = np.array([0]*n*m).reshape(n, m)
         for i in range(n):
             for j in range(m):
                 if random.random() < 0.1:
-                    new_map[i][j] = random.randint(0, self.max_towers - 1)
+                    new_map[i][j] = random.randint(0, towers_num - 1)
                 else:
                     new_map[i][j] = map[i][j]
         return new_map
@@ -142,7 +142,7 @@ class GeneticAlgorithm:
                     mutated_towers.append(self.mutate(tower))
                 else:
                     mutated_towers.append(tower)
-            mutated_map = self.mutate_map(genotype.map, self.x_range, self.y_range)
+            mutated_map = self.mutate_map(genotype.map, self.x_range, self.y_range, len(genotype.towers))
             mutated_genotype = Genotype(mutated_towers, self.x_range, self.y_range, mutated_map)
             mutated_population.append(mutated_genotype)
         return mutated_population
@@ -150,8 +150,9 @@ class GeneticAlgorithm:
 
     # We can use other methods later 
     def replace_population(self, population, offspring):
-        combined_population = population + offspring
-        return sorted(combined_population, key=lambda x: x.fitness, reverse=True)[:self.population_size]
+        population.extend(offspring)
+        combined_population = population
+        return sorted(combined_population, key=lambda x: self.fitness(x), reverse=True)[:self.population_size]
 
 
 
