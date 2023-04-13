@@ -38,7 +38,6 @@ class GeneticAlgorithm:
     def fitness(self, genotype):
         # calculate total cost of towers
         cost = sum([tower.calculate_cost() for tower in genotype.towers])
-        print(cost)
         
         # calculate total score of customers
         scores = 0.0
@@ -56,36 +55,19 @@ class GeneticAlgorithm:
                 real_block_bw = calculate_real_block_bandwidth((T.x, T.y), (i, j), T.bw, self.map[i][j], tower_covered_population)
                 user_bw = calculate_user_bandwidth(real_block_bw, self.map[i][j])
                 scores += cnf.get_score(user_bw) * self.map[i][j]
-        print(scores)
+
+        return cost + scores
                 
 
     def selection(self, population, num_parents):
-        sorted_pop = sorted(population, key=lambda x: x.fitness, reverse=True)
-        return sorted_pop[:num_parents]
-    
+        parents = []
+        for _ in range(num_parents):
+            k = 3
+            individuals = random.sample(population, k)
+            fittest = max(individuals, key=lambda x: x.fitness)
+            parents.append(fittest)
 
-    def one_point_crossover(self, parents, offspring_size):
-        offspring = []
-        for _ in range(offspring_size):
-            parent1 = parents[random.randint(0, len(parents)-1)]
-            parent2 = parents[random.randint(0, len(parents)-1)]
-            point = random.randint(1, len(parent1)-1)
-            offspring1 = parent1[:point] + parent2[point:]
-            offspring2 = parent2[:point] + parent1[point:]
-            offspring.append(offspring1)
-            offspring.append(offspring2)
-
-        return offspring
-    
-    
-    def two_point_crossover(parent1, parent2):
-        point1 = random.randint(0, len(parent1)-1)
-        point2 = random.randint(point1+1, len(parent1))
-        
-        child1 = parent1[:point1] + parent2[point1:point2] + parent1[point2:]
-        child2 = parent2[:point1] + parent1[point1:point2] + parent2[point2:]
-
-        return child1, child2
+        return parents
     
 
     def mutate(self, tower):
