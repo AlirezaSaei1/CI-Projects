@@ -57,7 +57,7 @@ class GeneticAlgorithm:
                 user_bw = calculate_user_bandwidth(real_block_bw, self.map[i][j])
                 scores += cnf.get_score(user_bw) * self.map[i][j]
 
-        return cost + scores
+        return scores - cost
                 
 
     def selection(self, population, num_parents):
@@ -71,17 +71,38 @@ class GeneticAlgorithm:
         return parents
     
 
-    def normalize_genotype(self, geno, towers, map):
-        pass
+    def normalize_genotype(self, geno, towers):
+        twrs_size = len(geno.towers)
+        new_twrs_size = len(towers)
+
+        # correction of tower IDs
+        for i in range(new_twrs_size):
+            towers[i].id = i
+
+        if  twrs_size > new_twrs_size:
+            max_id = new_twrs_size - 1
+            indices = np.where(geno.map > max_id)
+            new_values = np.random.randint(low=0, high=max_id+1, size=len(indices[0]))
+            geno.map[indices] = new_values
+            return Genotype(towers, self.x_range, self.y_range, geno.map)
+
+        elif twrs_size < new_twrs_size:
+            for t in range(twrs_size + 1, new_twrs_size):
+                for i in range(max(0, int(towers[t].x)-1), min(self.x_range, int(towers[t].x)+2)):
+                    for j in range(max(0, int(towers[t].y)-1), min(self.y_range, int(towers[t].y)+2)):
+                        geno.map[i][j] = towers[t].id
+            return Genotype(towers, self.x_range, self.y_range, geno.map)
+        else:
+            return Genotype(towers, self.x_range, self.y_range, geno.map)
     
 
     def one_point_crossover(self, genotypes):
-        parent1, parent2 = random.sample(genotypes, 2)
+        genotype1, genotype2 = random.sample(genotypes, 2)
         
-        crossover_point = random.randint(1, len(parent1.towers)-1)
+        crossover_point = random.randint(0, min(len(genotype2.towers), len(genotype1.towers)-1))
         
-        offspring1 = self.normalize_genotype(parent1, parent1.towers[:crossover_point] + parent2.towers[crossover_point:])
-        offspring2 = self.normalize_genotype(parent2, parent2.towers[:crossover_point] + parent1.towers[crossover_point:])
+        offspring1 = self.normalize_genotype(genotype1, np.concatenate((genotype1.towers[:crossover_point], genotype2.towers[crossover_point:])))
+        offspring2 = self.normalize_genotype(genotype2, np.concatenate((genotype2.towers[:crossover_point], genotype1.towers[crossover_point:])))
 
         return offspring1, offspring2
 

@@ -8,7 +8,7 @@ class Genotype:
         if len(map) == 0:
             self.map = self.assign_to_towers()
         else:
-            self.map = map
+            self.map = np.array(map)
     
 
     def assign_to_towers(self):
