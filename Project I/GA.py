@@ -46,6 +46,7 @@ class GeneticAlgorithm:
             for j in range(self.y_range):
                 id = genotype.map[i][j]
 
+
                 T = genotype.get_tower_by_id(id)
 
                 tower_covered_population = 0
@@ -67,7 +68,6 @@ class GeneticAlgorithm:
             k = 3
             individuals = random.sample(population, k)
             fittest = max(individuals, key=lambda x: self.fitness(x))
-            fittest = self.normalize_genotype(fittest, fittest.towers)
             parents.append(fittest)
 
         return parents
@@ -102,8 +102,14 @@ class GeneticAlgorithm:
         genotype1, genotype2 = random.sample(genotypes, 2)
         if random.random() < self.crossover_probability:
             crossover_point = random.randint(0, min(len(genotype2.towers), len(genotype1.towers)-1))
-            genotype1 = self.normalize_genotype(genotype1, np.concatenate((genotype1.towers[:crossover_point], genotype2.towers[crossover_point:])))
-            genotype2 = self.normalize_genotype(genotype2, np.concatenate((genotype2.towers[:crossover_point], genotype1.towers[crossover_point:])))
+            new_genotype1 = Genotype(np.concatenate((genotype1.towers[:crossover_point], 
+                                                     genotype2.towers[crossover_point:])), self.x_range, self.y_range, [])
+            new_genotype2 = Genotype(np.concatenate((genotype2.towers[:crossover_point], 
+                                                     genotype1.towers[crossover_point:])), self.x_range, self.y_range, [])
+            genotype1 = new_genotype1
+            genotype2 = new_genotype2
+        genotype1 = self.normalize_genotype(genotype1, genotype1.towers)
+        genotype2 = self.normalize_genotype(genotype2, genotype2.towers)
         return genotype1, genotype2
 
     

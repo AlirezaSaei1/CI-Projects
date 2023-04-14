@@ -28,7 +28,7 @@ if __name__ == '__main__':
     
     shape = population.shape
     ga = GeneticAlgorithm(population, 100, max(cnf.levels)*10000, shape[0], shape[1], 50, mutation_probability=0.1, crossover_probability=0.9)
-    
+
     for _ in range(50):
         selected_parents = ga.selection(ga.population, len(ga.population))
         
