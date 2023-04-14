@@ -2,6 +2,7 @@ import json
 import numpy as np
 from config import Configurations as cnf
 from GA import GeneticAlgorithm
+from matplotlib import pyplot as plt
 
 
 def read_population(file):
@@ -29,7 +30,9 @@ if __name__ == '__main__':
     shape = population.shape
     ga = GeneticAlgorithm(population, 100, max(cnf.levels)*10000, shape[0], shape[1], 50, mutation_probability=0.1, crossover_probability=0.9)
 
-    for _ in range(50):
+    answers = list()
+
+    for _ in range(100):
         selected_parents = ga.selection(ga.population, len(ga.population))
         
         recombined_genotypes = ga.one_point_crossover(selected_parents)
@@ -38,4 +41,9 @@ if __name__ == '__main__':
 
         ga.population = ga.replace_population(ga.population, mutated_genotypes)
 
-        print(np.mean([ga.fitness(genotype) for genotype in ga.population]))
+        answers.append(np.mean([ga.fitness(genotype) for genotype in ga.population]))
+
+    plt.xlabel("Generation")
+    plt.ylabel("Fitness")
+    plt.plot(answers)
+    plt.show()
