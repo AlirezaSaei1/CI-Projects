@@ -28,22 +28,35 @@ if __name__ == '__main__':
     population = read_population('data/blocks_population.txt')
     
     shape = population.shape
-    ga = GeneticAlgorithm(population, 100, max(cnf.levels)*10000, shape[0], shape[1], 50, mutation_probability=0.1, crossover_probability=0.9)
+    generations = 200
+    answers_all = []
+    mutation_probab = 0.1
+    crossover_probab = 0.9
 
-    answers = list()
+    for _ in range(10):
+        answers = []
+        ga = GeneticAlgorithm(population, 100, max(cnf.levels)*10000, shape[0], shape[1], 50, mutation_probability=mutation_probab, crossover_probability=crossover_probab)
 
-    for _ in range(100):
-        selected_parents = ga.selection(ga.population, len(ga.population))
+        for _ in range(generations):
+            selected_parents = ga.selection(ga.population, len(ga.population))
+            
+            recombined_genotypes = ga.one_point_crossover(selected_parents)
+
+            mutated_genotypes = ga.mutate_population(recombined_genotypes)
+
+            ga.population = ga.replace_population(ga.population, mutated_genotypes)
+
+            fitness_scores = np.array([ga.fitness(genotype) for genotype in ga.population])
+            mean_fitness = np.mean(fitness_scores)
+            answers.append(mean_fitness)
         
-        recombined_genotypes = ga.one_point_crossover(selected_parents)
+        answers_all.append(answers)
 
-        mutated_genotypes = ga.mutate_population(recombined_genotypes)
-
-        ga.population = ga.replace_population(ga.population, mutated_genotypes)
-
-        answers.append(np.mean([ga.fitness(genotype) for genotype in ga.population]))
+    mean_answers_all = np.array(answers_all)
+    mean_fitness_scores_mean = np.mean(mean_answers_all, axis=0)
 
     plt.xlabel("Generation")
     plt.ylabel("Fitness")
     plt.plot(answers)
+    plt.title(f'P_mutation = {mutation_probab} and P_crossover = {crossover_probab}')
     plt.show()
