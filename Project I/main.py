@@ -30,10 +30,12 @@ if __name__ == '__main__':
     shape = population.shape
     generations = 200
     answers_all = []
-    mutation_probab = 0.1
+    mutation_probab = 0.9
     crossover_probab = 0.9
 
-    for _ in range(10):
+    iterate = 0
+
+    for _ in range(5):
         answers = []
         ga = GeneticAlgorithm(population, 100, max(cnf.levels)*10000, shape[0], shape[1], 50, mutation_probability=mutation_probab, crossover_probability=crossover_probab)
 
@@ -49,8 +51,7 @@ if __name__ == '__main__':
             fitness_scores = np.array([ga.fitness(genotype) for genotype in ga.population])
             mean_fitness = np.mean(fitness_scores)
             answers.append(mean_fitness)
-        
-        answers_all.append(answers)
+        print('i')
 
     mean_answers_all = np.array(answers_all)
     mean_fitness_scores_mean = np.mean(mean_answers_all, axis=0)
