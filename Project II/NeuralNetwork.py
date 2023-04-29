@@ -31,12 +31,12 @@ class Sigmoid:
 
 class ReLU:
     def forward(self,inputs):
-        pass
-        # // To do: Implement the ReLU formula
+        self.outputs = np.maximum(0, inputs)
+        return self.outputs
 
     def backward(self,b_input):
-        pass
-        # // To do: Implement the ReLU derivative with respect to the input
+        derivative = np.where(self.outputs > 0, 1, 0)
+        return derivative * b_input
 
 
 class Softmax:
