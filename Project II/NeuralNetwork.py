@@ -1,4 +1,4 @@
-import numpy 
+import numpy as np
 
 class NeuralNetwork:
     def __init__(self):
@@ -21,12 +21,12 @@ class Dense:
 
 class Sigmoid:
     def forward(self,inputs):
-        pass
-        # // To do: Implement the sigmoid formula
+        self.outputs = 1 / (1 + np.exp(-inputs))
+        return self.outputs
 
     def backward(self,b_input):
-        pass
-        # // To do: Implement the sigmoid derivative with respect to the input
+        derivative = self.outputs * (1 - self.outputs)
+        return derivative * b_input
 
 
 class ReLU:
