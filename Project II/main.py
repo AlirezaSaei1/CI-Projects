@@ -1,5 +1,7 @@
 from keras.datasets import cifar10
 from classification_models.keras import Classifiers
+from keras.activations import softmax
+import numpy as np
 
 # uncomment this to download the weights of resnet34 if you don't have the .h5 file (85MB)
 # import urllib.request
@@ -8,21 +10,21 @@ from classification_models.keras import Classifiers
 
 
 # Get the CIFAR-10 dataset
-(x_train_subset, y_train_subset), (x_test_subset, y_test_subset) = cifar10.load_data()
+(x_train, y_train), (x_test, y_test) = cifar10.load_data()
 
 
 # Load the pre-trained ResNet34 model
 ResNet34, preprocess_input = Classifiers.get('resnet34')
-x_train = preprocess_input(x_train_subset)
-x_test = preprocess_input(x_test_subset)
+x_train = preprocess_input(x_train)
+x_test = preprocess_input(x_test)
 model = ResNet34(input_shape=(32, 32, 3), weights='resnet34_imagenet_1000.h5')
 
 
 # Extract features
-train_features = model.predict(x_train)
-test_features = model.predict(x_test)
+train_features = np.apply_along_axis(lambda x: np.exp(x) / np.sum(np.exp(x)), axis=1, arr=model.predict(x_train))
+test_features = np.apply_along_axis(lambda x: np.exp(x) / np.sum(np.exp(x)), axis=1, arr=model.predict(x_test))
 
 
-print('Train Features shape:', train_features)
+print('Train Features shape:', train_features.shape)
 print('Test Features shape:', test_features.shape)
 
