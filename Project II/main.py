@@ -11,6 +11,7 @@ import numpy as np
 
 # Get the CIFAR-10 dataset
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+# Categories (10): Airplane, Automobile, Bird, Cat, Deer, Dog, Frog, Horse, Ship, Truck
 
 
 # Load the pre-trained ResNet34 model

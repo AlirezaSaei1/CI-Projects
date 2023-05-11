@@ -1,7 +1,7 @@
 import numpy as np
 
 class Dense:
-    def __init__(self,n_inputs,n_neurons):
+    def __init__(self, n_inputs, n_neurons):
         self.weights = np.random.randn(n_inputs, n_neurons)
         self.biases = np.zeros((1, n_neurons))
     
@@ -38,14 +38,13 @@ class ReLU:
 
 
 class Softmax:
-    def forward(self,inputs):
-        pass
-        # // To do: Implement the softmax formula
+    def forward(self, inputs):
+        exp_inputs = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
+        self.outputs = exp_inputs / np.sum(exp_inputs, axis=1, keepdims=True)
+        return self.outputs
 
-    
-    def backward(self,b_input):
+    def backward(self, b_input):
         pass
-        # // To do: Implement the softmax derivative with respect to the input
 
 
 class Categorical_Cross_Entropy_loss:
