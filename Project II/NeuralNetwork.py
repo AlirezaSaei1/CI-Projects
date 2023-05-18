@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import numba
 
 
 class Dense:
@@ -20,88 +21,72 @@ class Dense:
 
 
 class Sigmoid:
+    @staticmethod
+    @numba.njit(fastmath=True)
+    def sigmoid(x):
+        return 1.0 / (1.0 + np.exp(-x))
+
     def forward(self, inputs):
-        self.outputs = []
-        for x in inputs:
-            sig = 1 / (1 + math.exp(-x))
-            self.outputs.append(sig)
+        self.outputs = self.sigmoid(inputs)
         return self.outputs
 
     def backward(self, b_input):
-        output_gradients = []
-        for i, out in enumerate(self.outputs):
-            grad = out * (1 - out) * b_input[i]
-            output_gradients.append(grad)
+        output_gradients = self.outputs * (1 - self.outputs) * b_input
         return output_gradients
 
 
 class ReLU:
+    @staticmethod
+    @numba.njit(fastmath=True)
+    def relu(x):
+        return np.maximum(0, x)
+
     def forward(self, inputs):
-        self.outputs = []
-        for x in inputs:
-            relu = max(0, x)
-            self.outputs.append(relu)
+        self.outputs = self.relu(inputs)
         return self.outputs
 
     def backward(self, b_input):
-        output_gradients = []
-        for i, out in enumerate(self.outputs):
-            grad = b_input[i] if out > 0 else 0
-            output_gradients.append(grad)
+        output_gradients = np.where(self.outputs > 0, b_input, 0)
         return output_gradients
 
 
 class Softmax:
+    @staticmethod
+    @numba.njit(fastmath=True)
+    def softmax(x):
+        exp_x = np.exp(x - np.max(x))
+        return exp_x / np.sum(exp_x, axis=1, keepdims=True)
+
     def forward(self, inputs):
-        exp_inputs = []
-        for x in inputs:
-            exp_x = [math.exp(i - max(x)) for i in x]
-            exp_inputs.append(exp_x)
-
-        self.outputs = []
-        for exp_x in exp_inputs:
-            sum_exp_x = sum(exp_x)
-            output = [x / sum_exp_x for x in exp_x]
-            self.outputs.append(output)
-
+        self.outputs = self.softmax(inputs)
         return self.outputs
 
     def backward(self, b_input):
-        softmax_outputs = self.forward(b_input)
+        softmax_outputs = self.outputs
 
-        jacobian = []
-        for i in range(len(softmax_outputs)):
-            row = []
-            for j in range(len(softmax_outputs)):
-                if i == j:
-                    row.append(softmax_outputs[i] * (1 - softmax_outputs[i]))
-                else:
-                    row.append(-softmax_outputs[i] * softmax_outputs[j])
-            jacobian.append(row)
+        jacobian = np.zeros((softmax_outputs.shape[0], softmax_outputs.shape[1], softmax_outputs.shape[1]))
+        diag_indices = np.diag_indices(jacobian.shape[-1])
+        jacobian[:, diag_indices[0], diag_indices[1]] = softmax_outputs * (1 - softmax_outputs)
+        off_diag_indices = np.where(jacobian == 0)
+        jacobian[:, off_diag_indices[0], off_diag_indices[1]] = -softmax_outputs.reshape(-1,1) * softmax_outputs
 
-        dL_dInputs = []
-        for i in range(len(b_input)):
-            row = []
-            for j in range(len(b_input[0])):
-                sum_jacob = 0
-                for k in range(len(jacobian)):
-                    sum_jacob += jacobian[k][j] * b_input[i][k]
-                row.append(sum_jacob)
-            dL_dInputs.append(row)
-
+        dL_dInputs = np.dot(b_input, jacobian.T)
         return dL_dInputs
 
 
 class CategoricalCrossEntropyLoss:
-    def forward(self, softmax_output, class_label):
+    @staticmethod
+    @numba.njit(fastmath=True)
+    def forward(softmax_output, class_label):
         return -math.log(softmax_output[class_label])
 
-    def backward(self, softmax_output, class_label):
-        gradient = [0] * len(softmax_output)
+    @staticmethod
+    @numba.njit(fastmath=True)
+    def backward(softmax_output, class_label):
+        gradient = np.zeros_like(softmax_output)
         gradient[class_label] = -1 / softmax_output[class_label]
-        for i in range(len(softmax_output)):
-            if i != class_label:
-                gradient[i] = (softmax_output[i] / softmax_output[class_label]) / softmax_output[class_label]
+        gradient[gradient == 0] = -softmax_output[gradient == 0] * softmax_output[class_label]
+        gradient /= softmax_output[class_label]
         return gradient
 
 
@@ -110,14 +95,5 @@ class SGD:
         self.learning_rate = learning_rate
 
     def update(self, layer: Dense):
-        weights = layer.weights
-        biases = layer.biases
-
-        weights_gradient = layer.weights_gradient
-        biases_gradient = layer.biases_gradient
-
-        weights -= self.learning_rate * weights_gradient
-        biases -= self.learning_rate * biases_gradient
-
-        layer.weights = weights
-        layer.biases = biases
+        layer.weights -= self.learning_rate * layer.weights_gradient
+        layer.biases -= self.learning_rate * layer.biases_gradient
