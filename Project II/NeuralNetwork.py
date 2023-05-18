@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 class Dense:
@@ -18,33 +20,81 @@ class Dense:
 
 
 class Sigmoid:
-    def forward(self,inputs):
-        self.outputs = 1 / (1 + np.exp(-inputs))
+    def forward(self, inputs):
+        self.outputs = []
+        for x in inputs:
+            sig = 1 / (1 + math.exp(-x))
+            self.outputs.append(sig)
         return self.outputs
 
-    def backward(self,b_input):
-        derivative = self.outputs * (1 - self.outputs)
-        return derivative * b_input
+    def backward(self, b_input):
+        output_gradients = []
+        for i, out in enumerate(self.outputs):
+            grad = out * (1 - out) * b_input[i]
+            output_gradients.append(grad)
+        return output_gradients
+
 
 
 class ReLU:
-    def forward(self,inputs):
-        self.outputs = np.maximum(0, inputs)
+    def forward(self, inputs):
+        self.outputs = []
+        for x in inputs:
+            relu = max(0, x)
+            self.outputs.append(relu)
         return self.outputs
 
-    def backward(self,b_input):
-        derivative = np.where(self.outputs > 0, 1, 0)
-        return derivative * b_input
+    def backward(self, b_input):
+        output_gradients = []
+        for i, out in enumerate(self.outputs):
+            grad = b_input[i] if out > 0 else 0
+            output_gradients.append(grad)
+        return output_gradients
 
 
 class Softmax:
     def forward(self, inputs):
-        exp_inputs = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
-        self.outputs = exp_inputs / np.sum(exp_inputs, axis=1, keepdims=True)
+        exp_inputs = []
+        for x in inputs:
+            exp_x = [math.exp(i - max(x)) for i in x]
+            exp_inputs.append(exp_x)
+
+        self.outputs = []
+        for exp_x in exp_inputs:
+            sum_exp_x = sum(exp_x)
+            output = [x / sum_exp_x for x in exp_x]
+            self.outputs.append(output)
+
         return self.outputs
 
-    def backward(self, b_input):
-        pass
+    def backward(self,b_input):
+        softmax_outputs = self.forward(b_input)
+
+        jacobian = []
+        for i in range(len(softmax_outputs)):
+            row = []
+            for j in range(len(softmax_outputs)):
+                if i == j:
+                    row.append(softmax_outputs[i] * (1 - softmax_outputs[i]))
+                    # diagonal elements of jacobian are S_i * (1 - S_i)
+                else:
+                    row.append(-softmax_outputs[i] * softmax_outputs[j])
+                    # off-diagonal elements are -S_i * S_j
+            jacobian.append(row)
+
+        # Calculate the derivative of loss with respect to inputs using chain rule and jacobian
+        dL_dInputs = []
+        for i in range(len(b_input)):
+            row = []
+            for j in range(len(b_input[0])):
+                sum_jacob = 0
+                for k in range(len(jacobian)):
+                    sum_jacob += jacobian[k][j] * b_input[i][k]
+                    # multiply jacobian of ith input with respect to all inputs with derivative of loss wrt ith input
+                row.append(sum_jacob)
+            dL_dInputs.append(row)
+
+        return dL_dInputs
 
 
 class Categorical_Cross_Entropy_loss:
