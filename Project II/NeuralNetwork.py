@@ -98,11 +98,12 @@ class Softmax:
 
 
 class Categorical_Cross_Entropy_loss:
-    def forward(self,softmax_output,class_label):
-        pass
-        # // To do: Implement the CCE loss formula
+    def forward(self, softmax_output, class_label):
+        self.softmax_output = softmax_output
+        self.class_label = class_label
+        return -math.log(softmax_output[class_label])
 
-    def backward(self,softmax_output,class_label):
+    def backward(self, softmax_output, class_label):
         pass
         # // To do: Implement the CCE loss derivative with respect to predicted label
 
