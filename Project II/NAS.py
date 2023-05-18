@@ -1,6 +1,6 @@
 import random
 
-activations = ['relu', 'sigmoid']
+activations = ['ReLU', 'Sigmoid']
 learning_rates = [0.1, 0.01, 0.001, 0.0001]
 
 class NAS:
@@ -10,9 +10,11 @@ class NAS:
 
     def random_network(self):
         # setup
-        layer_size = random.choice(range(128))
-        activation = random.choice(activations)
-        learning_rates = random.choice(learning_rates)
+        feature_extractor = ['ResNet18', 'ResNet34', 'Vgg11']
+        num_layers = random.choice([1, 2, 3])
+        layer_sizes = [random.choice([10, 20, 30]) for _ in range(num_layers)]
+        activations = [random.choice(activations) for _ in range(num_layers)]
+        learning_rate = random.choice(learning_rates)
 
         # TODO: neural network construction
         network = None
