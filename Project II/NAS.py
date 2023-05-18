@@ -54,7 +54,7 @@ class NAS:
             offspring = []
 
             # TODO: eval
-            fitness = []
+            fitness_scores = [self.evaluate(network) for network in offspring]
 
             # TODO: replacement
             population = []
