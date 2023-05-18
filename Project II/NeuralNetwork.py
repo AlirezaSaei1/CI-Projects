@@ -1,5 +1,4 @@
 import math
-
 import numpy as np
 
 class Dense:
@@ -99,13 +98,16 @@ class Softmax:
 
 class Categorical_Cross_Entropy_loss:
     def forward(self, softmax_output, class_label):
-        self.softmax_output = softmax_output
-        self.class_label = class_label
         return -math.log(softmax_output[class_label])
 
+
     def backward(self, softmax_output, class_label):
-        pass
-        # // To do: Implement the CCE loss derivative with respect to predicted label
+        gradient = [0] * len(softmax_output)
+        gradient[class_label] = -1/softmax_output[class_label]
+        for i in range(len(softmax_output)):
+            if i != class_label:
+                gradient[i] = (softmax_output[i]/softmax_output[class_label])/softmax_output[class_label]
+        return gradient
 
 
 class SGD:
