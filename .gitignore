@@ -1,2 +1,9 @@
 __pycache__/
 *.h5
+/.idea/.gitignore
+/.idea/CI-Projects.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
