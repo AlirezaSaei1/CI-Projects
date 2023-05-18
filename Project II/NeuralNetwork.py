@@ -114,6 +114,15 @@ class SGD:
     def __init__(self,learning_rate = 0.001):
         self.learning_rate = learning_rate
         
-    def update(self,layer):
-        pass
-        # // To do: Update layer params based on gradient descent rule
+    def update(self, layer:Dense):
+        weights = layer.weights
+        biases = layer.biases
+        
+        weights_gradient = layer.weights_gradient
+        biases_gradient = layer.biases_gradient
+
+        weights -= self.learning_rate * weights_gradient
+        biases -= self.learning_rate * biases_gradient
+
+        layer.weights = weights
+        layer.biases = biases
