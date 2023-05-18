@@ -6,12 +6,12 @@ class Dense:
         self.weights = np.random.randn(n_inputs, n_neurons)
         self.biases = np.zeros((1, n_neurons))
     
-    def forward(self,inputs):
+    def forward(self, inputs):
         self.inputs = inputs
         self.outputs = np.dot(self.inputs, self.weights) + self.biases
         return self.outputs
 
-    def backward(self,b_input):
+    def backward(self, b_input):
         self.weights_gradient = np.dot(self.inputs.T, b_input)
         self.biases_gradient = np.sum(b_input, axis=0, keepdims=True)
         b_output = np.dot(b_input, self.weights.T)
