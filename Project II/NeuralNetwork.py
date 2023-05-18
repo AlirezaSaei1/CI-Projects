@@ -1,11 +1,12 @@
 import math
 import numpy as np
 
+
 class Dense:
     def __init__(self, n_inputs, n_neurons):
         self.weights = np.random.randn(n_inputs, n_neurons)
         self.biases = np.zeros((1, n_neurons))
-    
+
     def forward(self, inputs):
         self.inputs = inputs
         self.outputs = np.dot(self.inputs, self.weights) + self.biases
@@ -32,7 +33,6 @@ class Sigmoid:
             grad = out * (1 - out) * b_input[i]
             output_gradients.append(grad)
         return output_gradients
-
 
 
 class ReLU:
@@ -66,7 +66,7 @@ class Softmax:
 
         return self.outputs
 
-    def backward(self,b_input):
+    def backward(self, b_input):
         softmax_outputs = self.forward(b_input)
 
         jacobian = []
@@ -75,13 +75,10 @@ class Softmax:
             for j in range(len(softmax_outputs)):
                 if i == j:
                     row.append(softmax_outputs[i] * (1 - softmax_outputs[i]))
-                    # diagonal elements of jacobian are S_i * (1 - S_i)
                 else:
                     row.append(-softmax_outputs[i] * softmax_outputs[j])
-                    # off-diagonal elements are -S_i * S_j
             jacobian.append(row)
 
-        # Calculate the derivative of loss with respect to inputs using chain rule and jacobian
         dL_dInputs = []
         for i in range(len(b_input)):
             row = []
@@ -89,35 +86,33 @@ class Softmax:
                 sum_jacob = 0
                 for k in range(len(jacobian)):
                     sum_jacob += jacobian[k][j] * b_input[i][k]
-                    # multiply jacobian of ith input with respect to all inputs with derivative of loss wrt ith input
                 row.append(sum_jacob)
             dL_dInputs.append(row)
 
         return dL_dInputs
 
 
-class Categorical_Cross_Entropy_loss:
+class CategoricalCrossEntropyLoss:
     def forward(self, softmax_output, class_label):
         return -math.log(softmax_output[class_label])
 
-
     def backward(self, softmax_output, class_label):
         gradient = [0] * len(softmax_output)
-        gradient[class_label] = -1/softmax_output[class_label]
+        gradient[class_label] = -1 / softmax_output[class_label]
         for i in range(len(softmax_output)):
             if i != class_label:
-                gradient[i] = (softmax_output[i]/softmax_output[class_label])/softmax_output[class_label]
+                gradient[i] = (softmax_output[i] / softmax_output[class_label]) / softmax_output[class_label]
         return gradient
 
 
 class SGD:
-    def __init__(self,learning_rate = 0.001):
+    def __init__(self, learning_rate=0.001):
         self.learning_rate = learning_rate
-        
-    def update(self, layer:Dense):
+
+    def update(self, layer: Dense):
         weights = layer.weights
         biases = layer.biases
-        
+
         weights_gradient = layer.weights_gradient
         biases_gradient = layer.biases_gradient
 

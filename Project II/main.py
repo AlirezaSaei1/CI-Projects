@@ -2,7 +2,7 @@ from keras.datasets import cifar10
 from classification_models.keras import Classifiers
 from keras.activations import softmax
 import numpy as np
-from NeuralNetwork import Dense, ReLU, Softmax, Categorical_Cross_Entropy_loss, SGD
+from NeuralNetwork import Dense, ReLU, Softmax, CategoricalCrossEntropyLoss, SGD
 
 # uncomment this to download the weights of resnet34 if you don't have the .h5 file (85MB)
 # import urllib.request
@@ -36,7 +36,7 @@ layers = [
     Dense(20, 10),
     Softmax()
 ]
-CCE_loss = Categorical_Cross_Entropy_loss()
+CCE_loss = CategoricalCrossEntropyLoss()
 opt = SGD()
 
 for epoch in range(100):
