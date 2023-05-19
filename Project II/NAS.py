@@ -55,8 +55,7 @@ class NAS:
         while len(selected) < len(population):
             individuals = random.sample(population, k)
             print(individuals)
-            # min
-            fittest = min(individuals, key=lambda network: self.evaluate(network))
+            fittest = max(individuals, key=lambda network: self.evaluate(network))
             selected.append(fittest)
 
         return selected
@@ -124,8 +123,7 @@ class NAS:
 
     def replacement(self, population, offspring):
         combined_population = population + offspring
-        # min sort
-        sorted_networks = sorted(combined_population, key=lambda x: self.evaluate(x))
+        sorted_networks = sorted(combined_population, key=lambda x: self.evaluate(x), reverse=True)
         population = sorted_networks[:len(population)]
 
         return population
