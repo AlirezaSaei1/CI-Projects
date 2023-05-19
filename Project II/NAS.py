@@ -9,13 +9,7 @@ feature_extractors = ['ResNet18', 'ResNet34', 'Vgg11']
 
 class NAS:
     def __init__(self) -> None:
-        self.search_space = {
-            'num_layers': layer_numbers,
-            'layer_sizes': layer_sizes_all,
-            'activations': activations_all,
-            'learning_rate': learning_rates_all,
-            'feature_extractor': feature_extractors
-        }
+        pass
 
     def random_network(self):
         # setup
@@ -60,23 +54,19 @@ class NAS:
 
         return population
 
-    def run(self, generations=10):
+    def run(self, generations=10, population_size=10):
+
+        population = [self.random_network() for _ in range(population_size)]
+
         for generation in range(generations):
             print(f'--- Generation {generation + 1} ---')
 
-            # TODO: selection
-            parents = []
+            parents = self.selection(population)
 
-            # TODO: crossover
-            offspring = []
+            offspring = self.crossover(parents)
 
-            # TODO: mutation
-            offspring = []
+            offspring = self.mutation(offspring)
 
-            # TODO: eval
-            fitness_scores = [self.evaluate(network) for network in offspring]
-
-            # TODO: replacement
             population = self.replacement(population, offspring)
 
         report = self.evaluate(population[0])
