@@ -1,6 +1,7 @@
 import random
-from NeuralNetwork import Dense
 import torchvision.models as models
+import torch.nn as nn
+from NeuralNetwork import Dense, ReLU, Softmax, CategoricalCrossEntropyLoss, SGD
 
 class NAS:
     def __init__(self) -> None:
@@ -8,7 +9,11 @@ class NAS:
             'num_layers': [1, 2, 3],
             'layer_sizes': [64, 128, 256, 512],
             'activations': ['ReLU', 'Sigmoid'],
-            'feature_extractor': [models.resnet18(), models.resnet34(), models.vgg11()]
+            'feature_extractor': [
+                nn.Sequential(*list(models.resnet18().children())[:-1]),
+                nn.Sequential(*list(models.resnet34().children())[:-1]),
+                nn.Sequential(*list(models.vgg11().features.children())[:-1])
+            ]
         }
 
     def random_network(self):
