@@ -1,13 +1,8 @@
 from keras.datasets import cifar10
 from classification_models.keras import Classifiers
-from keras.activations import softmax
 import numpy as np
+from keras.models import Model
 from NeuralNetwork import Dense, ReLU, Softmax, CategoricalCrossEntropyLoss, SGD
-
-# uncomment this to download the weights of resnet34 if you don't have the .h5 file (85MB)
-# import urllib.request
-# url = 'https://github.com/qubvel/classification_models/releases/download/0.0.1/resnet34_imagenet_1000.h5'
-# urllib.request.urlretrieve(url, 'resnet34_imagenet_1000.h5')
 
 
 # Get the CIFAR-10 dataset
@@ -15,18 +10,20 @@ from NeuralNetwork import Dense, ReLU, Softmax, CategoricalCrossEntropyLoss, SGD
 # Categories (10): Airplane, Automobile, Bird, Cat, Deer, Dog, Frog, Horse, Ship, Truck
 
 
-# Load the pre-trained ResNet34 model
 ResNet34, preprocess_input = Classifiers.get('resnet34')
-x_train = preprocess_input(x_train)
-x_test = preprocess_input(x_test)
-model = ResNet34(input_shape=(32, 32, 3), weights='resnet34_imagenet_1000.h5')
+base_model = ResNet34(input_shape=(32, 32, 3), weights='resnet34_imagenet_1000.h5')
 
+# Remove last layer
+model = Model(inputs=base_model.input, outputs=base_model.layers[-2].output)
+
+# Preprocess input data
+x_train_features = preprocess_input(x_train)
+x_test_features = preprocess_input(x_test)
 
 # Extract features
-train_features = np.apply_along_axis(lambda x: np.exp(x) / np.sum(np.exp(x)), axis=1, arr=model.predict(x_train))
-test_features = np.apply_along_axis(lambda x: np.exp(x) / np.sum(np.exp(x)), axis=1, arr=model.predict(x_test))
-
-
+train_features = model.predict(x_train_features)
+test_features = model.predict(x_test_features)
+print(train_features)
 print('Train Features shape:', train_features.shape)
 print('Test Features shape:', test_features.shape)
 
@@ -45,7 +42,7 @@ for epoch in range(100):
     accuracy = 0.0
     for x in range(len(x_train)):
         # forward
-        layers[0].forward(x_train[x].reshape(1, 512))
+        layers[0].forward(train_features[x])
         layers[1].forward(layers[0].output)
         layers[2].forward(layers[1].output)
         layers[3].forward(layers[2].output)
@@ -62,12 +59,9 @@ for epoch in range(100):
         layers[0].backward(layers[1].b_output)
 
         opt.update(layers[0])
-        opt.update(layers[2])
+        opt.update(layers[1])
 
     loss /= len(x_train)
     accuracy /= len(x_train)
     print(f'Loss: {loss}')
     print(f'Accuracy: {accuracy}')
-        
-        
-

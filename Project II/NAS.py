@@ -1,25 +1,37 @@
 import random
+from NeuralNetwork import Dense
 
+layer_numbers = [1, 2, 3]
+layer_sizes = [10, 20, 30]
 activations_all = ['ReLU', 'Sigmoid']
 learning_rates_all = [0.1, 0.01, 0.001, 0.0001]
-
+feature_extractors = ['ResNet18', 'ResNet34', 'Vgg11']
 
 class NAS:
     def __init__(self) -> None:
-        pass
+        self.search_space = {
+            'num_layers': layer_numbers,
+            'layer_sizes': layer_sizes,
+            'activations': activations_all,
+            'learning_rate': learning_rates_all,
+            'feature_extractor': feature_extractors
+        }
 
     def random_network(self):
         # setup
-        feature_extractor = ['ResNet18', 'ResNet34', 'Vgg11']
-        num_layers = random.choice([1, 2, 3])
-        layer_sizes = [random.choice([10, 20, 30]) for _ in range(num_layers)]
+        feature_extractor = random.choice(feature_extractors)
+        num_layers = random.choice(layer_numbers)
+        layer_sizes = [random.choice(layer_sizes) for _ in range(num_layers)]
         activations = [random.choice(activations_all) for _ in range(num_layers)]
         learning_rate = random.choice(learning_rates_all)
 
-        # TODO: neural network construction
-        network = None
+        input_size = 512
+        output_size = 10
+        layers = []
 
-        return network
+        # construct network
+        network = None
+        return network  
 
     def evaluate(self, network):
         pass
