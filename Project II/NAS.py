@@ -3,11 +3,12 @@ import torchvision.models as models
 import torch.nn as nn
 from NeuralNetwork import MLP
 
+
 class NAS:
     def __init__(self) -> None:
         self.search_space = {
             'num_layers': [1, 2, 3],
-            'layer_sizes': [64, 128, 256, 512],
+            'layer_sizes': [10, 20, 30],
             'activations': ['ReLU', 'Sigmoid'],
             'feature_extractor': [
                 nn.Sequential(*list(models.resnet18().children())[:-1]),
@@ -28,8 +29,26 @@ class NAS:
         return feature_extractor, MLP(input_size, output_size, layer_sizes, activations, loss_function="cross_entropy", learning_rate=0.001)
         
 
-    def evaluate(self, network):
-        pass
+    def evaluate(self, X, Y, network: MLP):
+        fitness_list = []
+        n_samples = X.shape[0]
+        indices = list(range(n_samples))
+        random.shuffle(indices)
+        subsample_size = int(n_samples / 5)
+        
+        for i in range(5):
+            subset_indices = indices[i*subsample_size:(i+1)*subsample_size]
+            X_subset = X[subset_indices]
+            Y_subset = Y[subset_indices]
+            
+            y_hat = network.forward(X_subset)
+            loss = network.loss.forward(y_hat, Y_subset)
+            fitness = 1.0 / (1.0 + loss)
+            fitness_list.append(fitness)
+        
+        avg_fitness = sum(fitness_list) / len(fitness_list)
+        return avg_fitness
+
 
     def selection(self, population, k=3):
         selected = []
