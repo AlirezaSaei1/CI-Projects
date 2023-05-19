@@ -61,8 +61,44 @@ class NAS:
 
         return selected
 
-    def crossover(self):
-        pass
+def crossover(self, parents):
+    offspring = []
+    for i in range(len(parents)):
+        parent1 = parents[i]
+        parent2 = parents[(i+1)%len(parents)]
+
+        feature_extractor1, network1 = parent1
+        feature_extractor2, network2 = parent2
+
+        if random.random() < 0.5:
+            feature_extractor = feature_extractor1
+        else:
+            feature_extractor = feature_extractor2
+
+        layer_sizes = []
+        activations = []
+
+        for j in range(min(len(network1.layer_sizes), len(network2.layer_sizes))):
+            if random.random() < 0.5:
+                layer_sizes.append(network1.layer_sizes[j])
+            else:
+                layer_sizes.append(network2.layer_sizes[j])
+
+        for j in range(min(len(network1.activations), len(network2.activations))):
+            if random.random() < 0.5:
+                activations.append(network1.activations[j])
+            else:
+                activations.append(network2.activations[j])
+
+        num_layers = len(layer_sizes)
+
+        input_size = 512
+        output_size = 10
+        offspring_network = MLP(input_size, output_size, layer_sizes, activations, loss_function="cross_entropy", learning_rate=0.001)
+        offspring.append((feature_extractor, offspring_network))
+
+        return offspring
+
 
     def mutation(self):
         pass
