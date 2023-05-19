@@ -28,7 +28,7 @@ print('Train Features shape:', train_features.shape)
 print('Test Features shape:', test_features.shape)
 
 layers = [
-    Dense(512, 20),
+    Dense(512*7*7, 20),
     ReLU(),
     Dense(20, 10),
     Softmax()

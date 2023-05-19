@@ -35,8 +35,15 @@ class NAS:
     def evaluate(self, network):
         pass
 
-    def selection(self):
-        pass
+    def selection(self, population, k=2):
+        selected = []
+        while len(selected) < len(population):
+            contestants = random.sample(population, k)
+            winner = max(contestants, key=lambda network: self.evaluate(network))
+            selected.append(winner)
+
+        return selected
+
 
     def crossover(self):
         pass
