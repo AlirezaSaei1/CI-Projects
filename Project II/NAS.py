@@ -35,15 +35,16 @@ class NAS:
     def evaluate(self, network):
         pass
 
-    def selection(self, population, k=2):
+    def selection(self, population, k=3):
         selected = []
         while len(selected) < len(population):
-            contestants = random.sample(population, k)
-            winner = max(contestants, key=lambda network: self.evaluate(network))
-            selected.append(winner)
+            individuals = random.sample(population, k)
+            print(individuals)
+            # min
+            fittest = min(individuals, key=lambda network: self.evaluate(network))
+            selected.append(fittest)
 
         return selected
-
 
     def crossover(self):
         pass
@@ -51,8 +52,13 @@ class NAS:
     def mutation(self):
         pass
 
-    def replacement(self):
-        pass
+    def replacement(self, population, offspring):
+        combined_population = population + offspring
+        # min sort
+        sorted_networks = sorted(combined_population, key=lambda x: self.evaluate(x))
+        population = sorted_networks[:len(population)]
+
+        return population
 
     def run(self, generations=10):
         for generation in range(generations):
@@ -71,7 +77,7 @@ class NAS:
             fitness_scores = [self.evaluate(network) for network in offspring]
 
             # TODO: replacement
-            population = []
+            population = self.replacement(population, offspring)
 
         report = self.evaluate(population[0])
         print(f'Report: {report}')
