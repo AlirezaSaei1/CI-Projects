@@ -1,23 +1,22 @@
 import random
 from NeuralNetwork import Dense
-import tensorflow as tf
-layer_numbers = [1, 2, 3]
-layer_sizes_all = [10, 20, 30]
-activations_all = ['ReLU', 'Sigmoid']
-learning_rates_all = [0.1, 0.01, 0.001, 0.0001]
-feature_extractors = ['ResNet18', 'ResNet34', 'Vgg11']
+import torchvision.models as models
 
 class NAS:
     def __init__(self) -> None:
-        pass
+        self.search_space = {
+            'num_layers': [1, 2, 3],
+            'layer_sizes': [64, 128, 256, 512],
+            'activations': ['ReLU', 'Sigmoid'],
+            'feature_extractor': [models.resnet18(), models.resnet34(), models.vgg11()]
+        }
 
     def random_network(self):
         # setup
-        feature_extractor = random.choice(feature_extractors)
-        num_layers = random.choice(layer_numbers)
-        layer_sizes = [random.choice(layer_sizes_all) for _ in range(num_layers)]
-        activations = [random.choice(activations_all) for _ in range(num_layers)]
-        learning_rate = random.choice(learning_rates_all)
+        feature_extractor = random.choice(self.search_space['feature_extractor'])
+        num_layers = random.choice(self.search_space['num_layers'])
+        layer_sizes = [random.choice(self.search_space['layer_sizes']) for _ in range(num_layers)]
+        activations = [random.choice(self.search_space['activations']) for _ in range(num_layers)]
 
         input_size = 512
         output_size = 10
