@@ -2,18 +2,61 @@ import math
 import numpy as np
 import numba
 
-class MLP:
-    def __init__(self, layers):
-        self.layers = layers
+class MLP():
+  def __init__(self, input_size, output_size, hidden_layer_number, hidden_layer_size, activation="sigmoid", loss_function="cross_entropy", learning_rate=0.001):
+    self.input_size = input_size
+    self.output_size = output_size
+    self.hidden_layer_number = hidden_layer_number
+    self.hidden_layer_size = hidden_layer_size
+    self.activation = activation
+    self.loss_function = loss_function
+    self.learning_rate = learning_rate
+    self.layers = []
 
-    def forward(self, inputs):
-        for layer in self.layers:
-            inputs = layer.forward(inputs)
-        return inputs
+    prev_layer_size = self.input_size
 
-    def backward(self, b_input):
-        for layer in reversed(self.layers):
-            b_input = layer.backward(b_input)
+    prev_layer_size = self.input_size
+    for layer_size in range(self.hidden_layer_number):
+        self.layers.append(Dense(prev_layer_size, layer_size))
+        if self.activation == "sigmoid":
+            self.layers.append(Sigmoid())
+        elif self.activation == "relu":
+            self.layers.append(ReLU())
+        else:
+            raise ValueError("Invalid activation function")
+        prev_layer_size = layer_size
+    self.layers.append(Dense(prev_layer_size, self.output_size))
+    if self.loss_function == "cross_entropy":
+        self.loss = CategoricalCrossEntropyLoss()
+        self.layers.append(Softmax())
+    else:
+        raise ValueError("Invalid loss function")
+
+    self.optimizer = SGD(self.learning_rate)
+
+  
+  def forward(self, X):
+    for layer in self.layers:
+      X = layer.forward(X)
+    return X
+
+
+  def backward(self, y_hat, y):
+    gradient = self.loss.backward(y_hat, y)
+    for layer in reversed(self.layers):
+      gradient = layer.backward(gradient)
+    return gradient
+
+  
+  def train(self, X, y, num_epochs):
+    for epoch in range(num_epochs):
+      y_hat = self.forward(X)
+      loss = self.loss.forward(y_hat, y)
+      gradient = self.backward(y_hat, y)
+      for layer in self.layers:
+        if isinstance(layer, Dense):
+          self.optimizer.update(layer)
+      print(f'Epoch {epoch+1} / {num_epochs}, Loss: {loss}')
 
 class Dense:
     def __init__(self, n_inputs, n_neurons):
