@@ -15,5 +15,22 @@ class SOM:
         return np.exp(-(d**2) / (2 * self.sigma**2))
         
 
-    def train():
-        pass
+    def train(self, data, epochs):
+        for epoch in range(epochs):
+            print(f'Epoch: {epoch}')
+            np.random.shuffle(data)
+            for d in data:
+                # Find best matching unit
+                bmu_idx = np.argmin(np.linalg.norm(self.weights - d, axis=-1))
+                bmu_x, bmu_y = np.unravel_index(bmu_idx, (self.x, self.y))
+
+                # Update weights
+                for i in range(self.x):
+                    for j in range(self.y):
+                        h = self._neighborhood(i, j)
+                        delta = self.lr * h[:, np.newaxis] * (d - self.weights[i, j])
+                        self.weights[i, j] += delta
+                        
+            # Decay
+            self.sigma = self.sigma * 0.9
+            self.lr = self.lr * 0.9
