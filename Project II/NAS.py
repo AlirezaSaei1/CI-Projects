@@ -2,7 +2,7 @@ import random
 import torchvision.models as models
 import torch.nn as nn
 from NeuralNetwork import MLP
-
+from main import x_train_features, y_train
 
 class NAS:
     def __init__(self) -> None:
@@ -29,7 +29,7 @@ class NAS:
         return feature_extractor, MLP(input_size, output_size, layer_sizes, activations, loss_function="cross_entropy", learning_rate=0.001)
         
 
-    def evaluate(self, X, Y, network: MLP):
+    def evaluate(self, network: MLP, X=x_train_features, Y=y_train):
         fitness_list = []
         n_samples = X.shape[0]
         indices = list(range(n_samples))
