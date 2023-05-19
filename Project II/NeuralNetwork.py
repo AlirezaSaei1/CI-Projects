@@ -3,28 +3,27 @@ import numpy as np
 import numba
 
 class MLP():
-  def __init__(self, input_size, output_size, hidden_layer_number, hidden_layer_size, activation="sigmoid", loss_function="cross_entropy", learning_rate=0.001):
+  def __init__(self, input_size, output_size, layer_sizes, activations, loss_function="cross_entropy", learning_rate=0.001):
     self.input_size = input_size
     self.output_size = output_size
-    self.hidden_layer_number = hidden_layer_number
-    self.hidden_layer_size = hidden_layer_size
-    self.activation = activation
+    self.layer_sizes = layer_sizes
+    self.activations = activations
     self.loss_function = loss_function
     self.learning_rate = learning_rate
     self.layers = []
 
     prev_layer_size = self.input_size
 
-    prev_layer_size = self.input_size
-    for layer_size in range(self.hidden_layer_number):
+    for layer_size, activation in zip(self.layer_sizes, self.activations):
         self.layers.append(Dense(prev_layer_size, layer_size))
-        if self.activation == "sigmoid":
+        if activation == "Sigmoid":
             self.layers.append(Sigmoid())
-        elif self.activation == "relu":
+        elif activation == "ReLU":
             self.layers.append(ReLU())
         else:
             raise ValueError("Invalid activation function")
         prev_layer_size = layer_size
+
     self.layers.append(Dense(prev_layer_size, self.output_size))
     if self.loss_function == "cross_entropy":
         self.loss = CategoricalCrossEntropyLoss()

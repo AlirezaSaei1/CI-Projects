@@ -1,7 +1,7 @@
 import random
 import torchvision.models as models
 import torch.nn as nn
-from NeuralNetwork import Dense, ReLU, Softmax, CategoricalCrossEntropyLoss, SGD
+from NeuralNetwork import MLP
 
 class NAS:
     def __init__(self) -> None:
@@ -25,10 +25,8 @@ class NAS:
 
         input_size = 512
         output_size = 10
-        layers = []
-
-        network = None
-        return network
+        return feature_extractor, MLP(input_size, output_size, layer_sizes, activations, loss_function="cross_entropy", learning_rate=0.001)
+        
 
     def evaluate(self, network):
         pass
