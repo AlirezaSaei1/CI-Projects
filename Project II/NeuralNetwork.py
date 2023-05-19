@@ -2,6 +2,18 @@ import math
 import numpy as np
 import numba
 
+class MLP:
+    def __init__(self, layers):
+        self.layers = layers
+
+    def forward(self, inputs):
+        for layer in self.layers:
+            inputs = layer.forward(inputs)
+        return inputs
+
+    def backward(self, b_input):
+        for layer in reversed(self.layers):
+            b_input = layer.backward(b_input)
 
 class Dense:
     def __init__(self, n_inputs, n_neurons):

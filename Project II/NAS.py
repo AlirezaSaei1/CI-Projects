@@ -1,13 +1,11 @@
 import random
-from NNArch import NNArch
 from NeuralNetwork import Dense
-
+import tensorflow as tf
 layer_numbers = [1, 2, 3]
 layer_sizes_all = [10, 20, 30]
 activations_all = ['ReLU', 'Sigmoid']
 learning_rates_all = [0.1, 0.01, 0.001, 0.0001]
 feature_extractors = ['ResNet18', 'ResNet34', 'Vgg11']
-
 
 class NAS:
     def __init__(self) -> None:
@@ -31,7 +29,7 @@ class NAS:
         output_size = 10
         layers = []
 
-        network = NNArch(num_layers, layer_sizes, activations, feature_extractor, learning_rate)
+        network = None
         return network
 
     def evaluate(self, network):
