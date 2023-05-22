@@ -1,6 +1,9 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-
+from keras.datasets import cifar10
+from classification_models.keras import Classifiers
+import numpy as np
+from keras.models import Model
 
 class SOM:
     def __init__(self, x, y, input_dim, sigma=1.0, lr=0.1):
@@ -89,3 +92,15 @@ class SOM:
         cax = divider.append_axes('right', size='5%', pad=0.05)
         plt.colorbar(im, cax=cax)
         plt.show()
+
+
+if __name__ == '__main__':
+    (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+
+    ResNet34, preprocess_input = Classifiers.get('resnet34')
+    base_model = ResNet34(input_shape=(32, 32, 3), weights='resnet34_imagenet_1000.h5')
+
+    # make resnet34 a feature extractor
+    model = Model(inputs=base_model.input, outputs=base_model.layers[-2].output)
+
+    
