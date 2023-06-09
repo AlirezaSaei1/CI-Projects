@@ -84,3 +84,33 @@ pd.DataFrame(records_selection, columns=feature_name_selection).head()
 
 
 ## TODO: build a fuzzy rule-based model for (records, label)
+def iso_triangular(x, a, b, c):
+    if x <= a:
+        return 0
+    elif a < x < b:
+        return (x - a) / (b - a)
+    elif b <= x < c:
+        return 1
+    elif c <= x:
+        return (c - x) / (c - b)
+
+
+def rect_triangular(x, a, b, c, d):
+    if x <= a:
+        return 0
+    elif a < x < b:
+        return (x - a) / (b - a)
+    elif b <= x < c:
+        return 1
+    elif c <= x < d:
+        return (d - x) / (d - c)
+    elif d <= x:
+        return 0
+
+
+def gaussian(x, mu, sigma):
+    return np.exp(-(x - mu) ** 2 / (2 * sigma ** 2)) / (np.sqrt(2 * np.pi) * sigma)
+
+
+def sigmoid(x, alpha=1, c=0):
+    return 1 / (1 + np.exp(-alpha * (x - c)))
